@@ -327,35 +327,41 @@ const position = [
 
 const teams = [
 	{
+		id: 1,
 		name: "DesignTeam2",
 		members: [24, 25, 26, 27],
 		reportsTo: 4
 	},
 	{
+		id: 2,
 		name: "DesignTeam1",
-		members: [24, 25, 26, 27],
+		members: [5, 6, 7],
 		reportsTo: 4
 	},
 	{
+		id:3,
 		name: "HRTeam1",
 		members: [13, 14, 15],
 		reportsTo: 2
 	},
 	{
+		id:4,
 		name: "HRTeam2",
 		members: [16, 17, 18, 28],
 		reportsTo: 2
 	},
 	{
+		id:5,
 		name: "DevTeam1",
 		members: [8, 9, 10, 11, 12],
 		reportsTo: 2
 	},
 	{
+		id: 6,
 		name: "DevTeam2",
 		members: [19, 20, 21, 22, 23],
 		reportsTo: 2
 	}
 ];
 
-export { employeeData };
+export { employeeData, teams, position };
