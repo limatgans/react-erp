@@ -7,6 +7,7 @@ function EmployeeCard({
 	email,
 	phone,
 	position,
+	removeEmployee,
 	handleSave = () => {},
 }) {
 	const [isEdit, toggleEdit] = useState(false);
@@ -46,6 +47,11 @@ function EmployeeCard({
 		toggleEdit(false);
 	}
 
+	const handleRemove=(e)=> {
+		const removedStatus = removeEmployee(id);
+		alert(removedStatus.msg);
+	}
+
 	return (
 		<div className="employeeCard">
 			{/* <p>{id}</p> */}
@@ -67,7 +73,7 @@ function EmployeeCard({
 				</>
 			)}
 			<button className="employeeItems">PROMOTE</button>
-			<button className="employeeItems">REMOVE</button>
+			<button className="employeeItems" onClick={handleRemove}>REMOVE</button>
 			<button className="employeeItems">MOVE</button>
 		</div>
 	);

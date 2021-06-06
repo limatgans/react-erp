@@ -1,7 +1,12 @@
+:root {
+  --main-bg-color: #282c34;
+  --text-color: white;
+}
+
 .App {
   text-align: center;
-  background-color: #282c34;
-  color: white;
+  background-color: var(--main-bg-color);
+  color: var(--text-color);
 }
 
 .App-logo {
@@ -16,14 +21,14 @@
 }
 
 .App-header {
-  background-color: #282c34;
+  background-color: var(--main-bg-color);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  color: white;
+  color: var(--text-color);
 }
 
 .App-link {
@@ -41,4 +46,41 @@
 
 button {
   font-size: calc(10px + 2vmin);
+}
+
+
+/* Modal CSS */
+
+.modal {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  outline: 0;
+  background-color: rgba(128, 128, 128, 0.75);
+  z-index: 1050;
+  display: flex;
+  align-items: center;
+  color: var(--text-color);
+  justify-content: center;
+}
+
+.modal-content {
+  width: 500px;
+  background-color: var(--main-bg-color);
+}
+
+.modal-header, .modal-footer {
+  padding: 10px;
+}
+
+.modal-title {
+  margin: 0;
+}
+
+.modal-body {
+  padding: 10px;
+  border-top: 1px solid #eeeeee;
+  border-bottom: 1px solid #eeeeee;
 }
