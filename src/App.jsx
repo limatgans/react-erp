@@ -32,9 +32,10 @@ function App() {
 	}, [empData, posData, teamData]);
 
 	// CRUD fns
-	const addEmployee = (name, phone, email, position) => {
+	const addEmployee = ({name, phone, email, position, teamId}) => {
 		const empExists = empData.find(emp => emp.email === email);
 		const posExists = posData.find(pos => pos.id === position);
+		const teamExists = teamData.find(team => team.id === teamId);
 
 		if (empExists) {
 			return {
@@ -47,6 +48,13 @@ function App() {
 			return {
 				status: false,
 				msg: "Invalid Positon",
+			};
+		}
+
+		if (!teamExists) {
+			return {
+				status: false,
+				msg: "Invalid Team Id",
 			};
 		}
 
