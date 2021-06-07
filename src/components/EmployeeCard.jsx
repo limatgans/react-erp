@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import "./EmployeeCard.css";
 
+import { validateEmail } from "../utils/utils";
+
 function EmployeeCard({
 	id,
 	name,
@@ -8,7 +10,7 @@ function EmployeeCard({
 	phone,
 	position,
 	removeEmployee,
-	handleSave = () => {},
+	editEmployee,
 }) {
 	const [isEdit, toggleEdit] = useState(false);
 
@@ -38,42 +40,70 @@ function EmployeeCard({
 	};
 
 	const handleEmpSave = () => {
-		handleSave({
-			empName,
-			empEmail,
-			empPhone,
-			// empPosition
+		if (!empName || !empEmail || !empPhone) {
+			return alert("Please fill all details");
+		}
+
+		if (!validateEmail(email)) {
+			return alert("Invalid Email");
+		}
+
+		editEmployee({
+			name: empName,
+			email: empEmail,
+			phone: empPhone,
 		});
 		toggleEdit(false);
-	}
+	};
 
-	const handleRemove=(e)=> {
+	const handleRemove = e => {
 		const removedStatus = removeEmployee(id);
 		alert(removedStatus.msg);
-	}
+	};
 
 	return (
 		<div className="employeeCard">
 			{/* <p>{id}</p> */}
 			{isEdit ? (
 				<>
-					<input className="width-1em employeeItems" type="text" value={empName} onChange={e => handleNameChange(e)} />
+					<input
+						className="width-1em employeeItems"
+						type="text"
+						value={empName}
+						onChange={e => handleNameChange(e)}
+					/>
 					<p className="width-1em employeeItems">{empPosition}</p>
-					<input className="width-1em employeeItems" type="text" value={empEmail} onChange={e => handleEmailChange(e)}/>
-					<input className="width-1em employeeItems" type="text" value={empPhone} onChange={e => handlePhoneChange(e)}/>
-					<button className="employeeItems" onClick={handleEmpSave}>SAVE</button>
+					<input
+						className="width-1em employeeItems"
+						type="text"
+						value={empEmail}
+						onChange={e => handleEmailChange(e)}
+					/>
+					<input
+						className="width-1em employeeItems"
+						type="text"
+						value={empPhone}
+						onChange={e => handlePhoneChange(e)}
+					/>
+					<button className="employeeItems" onClick={handleEmpSave}>
+						SAVE
+					</button>
 				</>
 			) : (
 				<>
 					<p className="width-1em employeeItems">{empName}</p>
-					<p className="width-1em employeeItems" >{empPosition}</p>
+					<p className="width-1em employeeItems">{empPosition}</p>
 					<p className="width-1em employeeItems">{empEmail}</p>
 					<p className="width-1em employeeItems">{empPhone}</p>
-					<button className="employeeItems" onClick={handleEdit}>EDIT</button>
+					<button className="employeeItems" onClick={handleEdit}>
+						EDIT
+					</button>
 				</>
 			)}
 			<button className="employeeItems">PROMOTE</button>
-			<button className="employeeItems" onClick={handleRemove}>REMOVE</button>
+			<button className="employeeItems" onClick={handleRemove}>
+				REMOVE
+			</button>
 			<button className="employeeItems">MOVE</button>
 		</div>
 	);

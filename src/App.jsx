@@ -79,7 +79,7 @@ function App() {
 		const newTeams = teamData.map(team => {
 			const memIndex = team.members.findIndex(mem => mem === id);
 			if (memIndex !== -1) {
-				return { ...team, members: team.members.filter((mem)=>mem !== id) };
+				return { ...team, members: team.members.filter(mem => mem !== id) };
 			}
 			return team;
 		});
@@ -93,13 +93,53 @@ function App() {
 		};
 	};
 
+	const editEmployee = ({ id, name, email, phone, position }) => {
+		const empIndex = empData.findIndex(emp => emp.id === id);
+		const empWithSameDetails = empData.find(emp => emp.id !== id && emp.email === email && emp.phone === phone);
+
+		if (empIndex === -1) {
+			return {
+				status: false,
+				msg: "Employee does not Exists",
+			};
+		}
+
+		if (empWithSameDetails) {
+			return {
+				status: false,
+				msg: "An employee already exists with the new email or phone",
+			};
+		}
+
+		const newEmpList = empData.map((emp, idx) => {
+			if (idx === id) {
+				return {
+					...emp,
+					name: name ? name : emp.name,
+					email: email ? email : emp.email,
+					phone: phone? phone: emp.phone,
+					position: position? position: emp.position
+				};
+			}
+			return emp;
+		});
+
+		setEmpData(newEmpList);
+	};
+
 	return (
 		<>
 			<div className="App">
 				<Header />
 				{teamDisplayData.map((team, index) => {
 					return (
-						<TeamsList key={team.id} data={team} addEmployee={addEmployee} removeEmployee={removeEmployee}/>
+						<TeamsList
+							key={team.id}
+							data={team}
+							addEmployee={addEmployee}
+							removeEmployee={removeEmployee}
+							editEmployee={editEmployee}
+						/>
 					);
 				})}
 				{/* <EmployeeCardList data={displayData} /> */}
