@@ -354,13 +354,13 @@ const teams = [
 		id:5,
 		name: "DevTeam1",
 		members: [8, 9, 10, 11, 12],
-		reportsTo: 2
+		reportsTo: 3
 	},
 	{
 		id: 6,
 		name: "DevTeam2",
 		members: [19, 20, 21, 22, 23],
-		reportsTo: 2
+		reportsTo: 3
 	}
 ];
 

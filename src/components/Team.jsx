@@ -9,7 +9,8 @@ function TeamsList({
 	editEmployee,
 	promoteEmployee,
 	getPositionsForTeam,
-	getTeamsForEmp
+	getTeamsForEmp,
+	moveEmployee
 }) {
 	const { id, name, members } = data;
 	const [showAddMemberModal, toggleAddMemberModal] = useState(false);
@@ -36,6 +37,7 @@ function TeamsList({
 					editEmployee={editEmployee}
 					promoteEmployee={promoteEmployee}
 					getTeamsForEmp={getTeamsForEmp}
+					moveEmployee={moveEmployee}
 				/>
 			))}
 			<AddMemberModal

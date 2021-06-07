@@ -221,7 +221,7 @@ function App() {
 	};
 
 	const getTeamsForEmp = empId => {
-		const emp = empData.find(emp => emp.id === id);
+		const emp = empData.find(emp => emp.id === empId);
 		if (!emp) {
 			return {
 				status: false,
@@ -237,14 +237,65 @@ function App() {
 			};
 		}
 
-		const teamsAvailable = teamData.filter(
-			team => team.reportsTo === pos.reportsTo && !team.members.includes(empId),
-		);
+		// Team reports to an employee
+		// Employee reports to a position
+
+		// const teamsAvailable = teamData.filter(
+		// 	team => team.reportsTo === pos.reportsTo && !team.members.includes(empId),
+		// );
+
+
+		const teamsAvailable = teamData.filter(team => {
+			// Find which employee the team reports to
+			const reportingEmployee = empData.find(emp => emp.id === team.reportsTo);
+			if (!reportingEmployee) return;
+			// Find Which position that employee is
+			// Compare pos.reports with that reporting position
+			return (
+				reportingEmployee.position === pos.reportsTo &&
+				!team.members.includes(empId)
+			);
+		}); 
 
 		return {
 			status: true,
 			msg: "Teams fetched",
 			data: teamsAvailable,
+		};
+	};
+
+	const moveEmployee = ({ teamId, empId }) => {
+		const emp = empData.find(emp => emp.id === empId);
+		if (!emp) {
+			return {
+				status: false,
+				msg: "Employee Details not found",
+			};
+		}
+
+		const previousTeam = teamData.find(team => team.members.includes(empId));
+		const currentTeam = teamData.find(team => team.id === teamId);
+
+		const newTeam = teamData.map(team => {
+			if (team.id === currentTeam.id) {
+				return {
+					...team,
+					members: [...team.members, empId],
+				};
+			}
+			if (team.id === previousTeam.id) {
+				return {
+					...team,
+					members: team.members.filter(mem => mem !== empId),
+				};
+			}
+			return team;
+		});
+
+		setTeamData(newTeam);
+		return {
+			status: true,
+			msg: "Employee moved to new team successfully!",
 		};
 	};
 
@@ -263,6 +314,7 @@ function App() {
 							promoteEmployee={promoteEmployee}
 							getPositionsForTeam={getPositionsForTeam}
 							getTeamsForEmp={getTeamsForEmp}
+							moveEmployee={moveEmployee}
 						/>
 					);
 				})}
