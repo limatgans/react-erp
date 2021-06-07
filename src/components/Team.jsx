@@ -2,7 +2,15 @@ import React, { useState } from "react";
 import AddMemberModal from "./AddMemberModal";
 import EmployeeCard from "./EmployeeCard";
 
-function TeamsList({ data, addEmployee, removeEmployee }) {
+function TeamsList({
+	data,
+	addEmployee,
+	removeEmployee,
+	editEmployee,
+	promoteEmployee,
+	getPositionsForTeam,
+	getTeamsForEmp
+}) {
 	const { id, name, members } = data;
 	const [showAddMemberModal, toggleAddMemberModal] = useState(false);
 
@@ -25,6 +33,9 @@ function TeamsList({ data, addEmployee, removeEmployee }) {
 					email={employee.email}
 					phone={employee.phone}
 					removeEmployee={removeEmployee}
+					editEmployee={editEmployee}
+					promoteEmployee={promoteEmployee}
+					getTeamsForEmp={getTeamsForEmp}
 				/>
 			))}
 			<AddMemberModal

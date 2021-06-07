@@ -87,7 +87,7 @@ function App() {
 		const newTeams = teamData.map(team => {
 			const memIndex = team.members.findIndex(mem => mem === id);
 			if (memIndex !== -1) {
-				return { ...team, members: team.members.filter((mem)=>mem !== id) };
+				return { ...team, members: team.members.filter(mem => mem !== id) };
 			}
 			return team;
 		});
@@ -101,18 +101,157 @@ function App() {
 		};
 	};
 
+	const editEmployee = ({ id, name, email, phone, position }) => {
+		const empIndex = empData.findIndex(emp => emp.id === id);
+		const empWithSameDetails = empData.find(
+			emp => emp.id !== id && emp.email === email && emp.phone === phone,
+		);
+
+		if (empIndex === -1) {
+			return {
+				status: false,
+				msg: "Employee does not Exists",
+			};
+		}
+
+		if (empWithSameDetails) {
+			return {
+				status: false,
+				msg: "An employee already exists with the new email or phone",
+			};
+		}
+
+		const newEmpList = empData.map((emp, idx) => {
+			if (idx === id) {
+				return {
+					...emp,
+					name: name ? name : emp.name,
+					email: email ? email : emp.email,
+					phone: phone ? phone : emp.phone,
+					position: position ? position : emp.position,
+				};
+			}
+			return emp;
+		});
+
+		setEmpData(newEmpList);
+
+		return {
+			status: true,
+			msg: "Employee Details has been updated Successfully",
+		};
+	};
+
+	const promoteEmployee = id => {
+		const emp = empData.find(emp => emp.id === id);
+		const posDetails = posData.find(pos => pos.id === emp.position);
+
+		if (!emp || !posDetails) {
+			return {
+				status: false,
+				msg: "Employee Details / Position Details not found",
+			};
+		}
+
+		// If Employee is CEO / Top of position
+		if (posDetails.reportsTo === 0) {
+			return {
+				status: false,
+				msg: `${emp.name} cannot be promoted as he is already at the top of position table`,
+			};
+		}
+
+		// Updating Position
+		const updated = editEmployee({ id, position: posDetails.reportsTo });
+
+		if (updated.status) {
+			// Removing Employee from Teams Data
+			const newTeams = teamData.map(team => {
+				const memIndex = team.members.findIndex(mem => mem === id);
+				if (memIndex !== -1) {
+					return { ...team, members: team.members.filter(mem => mem !== id) };
+				}
+				return team;
+			});
+
+			setTeamData(newTeams);
+			return {
+				status: true,
+				msg: "Employee has been promoted!",
+			};
+		}
+
+		return updated;
+	};
+
+	const getPositionsForTeam = teamId => {
+		const team = teamData.find(tm => tm.id === teamId);
+
+		if (!team) {
+			return {
+				status: false,
+				msg: "Couldn't fetch Team",
+			};
+		}
+
+		const positions = posData
+			.filter(pos => pos.reportsTo === team.reportsTo)
+			.map(pos => { return {name: pos.name, id: pos.id}});
+
+		return {
+			status: true,
+			msg: "Positions fetched",
+			data: positions
+		}
+	};
+
+	const getTeamsForEmp = (empId) => {
+		const emp = empData.find(emp => emp.id === id);
+		if (!emp ) {
+			return {
+				status: false,
+				msg: "Employee Details not found",
+			};
+		}
+
+		const pos = posData.find(p => p.id === emp.position);
+		if (!pos) {
+			return {
+				status: false,
+				msg: "Invalid Positon",
+			};
+		}
+
+		const teamsAvailable = teamData.filter((team) => team.reportsTo === pos.reportsTo && !team.members.includes(empId)) 
+		
+		return {
+			status: true,
+			msg: "Teams fetched",
+			data: teamsAvailable
+		}
+	}
+
 	return (
 		<>
 			<div className="App">
 				<Header />
 				{teamDisplayData.map((team, index) => {
 					return (
-						<TeamsList key={team.id} data={team} addEmployee={addEmployee} removeEmployee={removeEmployee}/>
+						<TeamsList
+							key={team.id}
+							data={team}
+							addEmployee={addEmployee}
+							removeEmployee={removeEmployee}
+							editEmployee={editEmployee}
+							promoteEmployee={promoteEmployee}
+							getPositionsForTeam={getPositionsForTeam}
+							getTeamsForEmp={getTeamsForEmp}
+
+						/>
 					);
 				})}
 				{/* <EmployeeCardList data={displayData} /> */}
 			</div>
-			;
 		</>
 	);
 }
