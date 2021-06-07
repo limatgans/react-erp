@@ -12,6 +12,7 @@ function EmployeeCard({
 	removeEmployee,
 	editEmployee,
 	promoteEmployee,
+	getTeamsForEmp
 }) {
 	const [isEdit, toggleEdit] = useState(false);
 

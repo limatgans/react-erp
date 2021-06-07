@@ -176,6 +176,53 @@ function App() {
 		return updated;
 	};
 
+	const getPositionsForTeam = teamId => {
+		const team = teamData.find(tm => tm.id === teamId);
+
+		if (!team) {
+			return {
+				status: false,
+				msg: "Couldn't fetch Team",
+			};
+		}
+
+		const positions = posData
+			.filter(pos => pos.reportsTo === team.reportsTo)
+			.map(pos => { return {name: pos.name, id: pos.id}});
+
+		return {
+			status: true,
+			msg: "Positions fetched",
+			data: positions
+		}
+	};
+
+	const getTeamsForEmp = (empId) => {
+		const emp = empData.find(emp => emp.id === id);
+		if (!emp ) {
+			return {
+				status: false,
+				msg: "Employee Details not found",
+			};
+		}
+
+		const pos = posData.find(p => p.id === emp.position);
+		if (!pos) {
+			return {
+				status: false,
+				msg: "Invalid Positon",
+			};
+		}
+
+		const teamsAvailable = teamData.filter((team) => team.reportsTo === pos.reportsTo && !team.members.includes(empId)) 
+		
+		return {
+			status: true,
+			msg: "Teams fetched",
+			data: teamsAvailable
+		}
+	}
+
 	return (
 		<>
 			<div className="App">
@@ -189,6 +236,9 @@ function App() {
 							removeEmployee={removeEmployee}
 							editEmployee={editEmployee}
 							promoteEmployee={promoteEmployee}
+							getPositionsForTeam={getPositionsForTeam}
+							getTeamsForEmp={getTeamsForEmp}
+
 						/>
 					);
 				})}
