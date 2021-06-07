@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-// import AddMemberModal from "./AddMemberModal";
+import AddMemberModal from "./AddMemberModal";
 import EmployeeCard from "./EmployeeCard";
 
 function TeamsList({ data, addEmployee, removeEmployee }) {
-	const { name, members } = data;
+	const { id, name, members } = data;
 	const [showAddMemberModal, toggleAddMemberModal] = useState(false);
 
 	const closeAddNewMemModal = e => {
@@ -27,11 +27,12 @@ function TeamsList({ data, addEmployee, removeEmployee }) {
 					removeEmployee={removeEmployee}
 				/>
 			))}
-			{/* <AddMemberModal
+			<AddMemberModal
 				visible={showAddMemberModal}
 				closeModal={closeAddNewMemModal}
 				addEmployee={addEmployee}
-			/> */}
+				teamId = {id}
+			/>
 		</>
 	);
 }
