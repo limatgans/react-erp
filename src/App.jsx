@@ -95,7 +95,9 @@ function App() {
 
 	const editEmployee = ({ id, name, email, phone, position }) => {
 		const empIndex = empData.findIndex(emp => emp.id === id);
-		const empWithSameDetails = empData.find(emp => emp.id !== id && emp.email === email && emp.phone === phone);
+		const empWithSameDetails = empData.find(
+			emp => emp.id !== id && emp.email === email && emp.phone === phone,
+		);
 
 		if (empIndex === -1) {
 			return {
@@ -117,14 +119,61 @@ function App() {
 					...emp,
 					name: name ? name : emp.name,
 					email: email ? email : emp.email,
-					phone: phone? phone: emp.phone,
-					position: position? position: emp.position
+					phone: phone ? phone : emp.phone,
+					position: position ? position : emp.position,
 				};
 			}
 			return emp;
 		});
 
 		setEmpData(newEmpList);
+
+		return {
+			status: true,
+			msg: "Employee Details has been updated Successfully",
+		};
+	};
+
+	const promoteEmployee = id => {
+		const emp = empData.find(emp => emp.id === id);
+		const posDetails = posData.find(pos => pos.id === emp.position);
+
+		if (!emp || !posDetails) {
+			return {
+				status: false,
+				msg: "Employee Details / Position Details not found",
+			};
+		}
+
+		// If Employee is CEO / Top of position
+		if (posDetails.reportsTo === 0) {
+			return {
+				status: false,
+				msg: `${emp.name} cannot be promoted as he is already at the top of position table`,
+			};
+		}
+
+		// Updating Position
+		const updated = editEmployee({ id, position: posDetails.reportsTo });
+
+		if (updated.status) {
+			// Removing Employee from Teams Data
+			const newTeams = teamData.map(team => {
+				const memIndex = team.members.findIndex(mem => mem === id);
+				if (memIndex !== -1) {
+					return { ...team, members: team.members.filter(mem => mem !== id) };
+				}
+				return team;
+			});
+
+			setTeamData(newTeams);
+			return {
+				status: true,
+				msg: "Employee has been promoted!",
+			};
+		}
+
+		return updated;
 	};
 
 	return (
@@ -139,12 +188,12 @@ function App() {
 							addEmployee={addEmployee}
 							removeEmployee={removeEmployee}
 							editEmployee={editEmployee}
+							promoteEmployee={promoteEmployee}
 						/>
 					);
 				})}
 				{/* <EmployeeCardList data={displayData} /> */}
 			</div>
-			;
 		</>
 	);
 }

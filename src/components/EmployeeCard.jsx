@@ -11,6 +11,7 @@ function EmployeeCard({
 	position,
 	removeEmployee,
 	editEmployee,
+	promoteEmployee,
 }) {
 	const [isEdit, toggleEdit] = useState(false);
 
@@ -88,6 +89,13 @@ function EmployeeCard({
 					<button className="employeeItems" onClick={handleEmpSave}>
 						SAVE
 					</button>
+					<button
+						className="employeeItems"
+						onClick={e => {
+							toggleEdit(false);
+						}}>
+						CANCEL
+					</button>
 				</>
 			) : (
 				<>
@@ -98,13 +106,19 @@ function EmployeeCard({
 					<button className="employeeItems" onClick={handleEdit}>
 						EDIT
 					</button>
+					<button
+						className="employeeItems"
+						onClick={e => {
+							alert(promoteEmployee(id).msg);
+						}}>
+						PROMOTE
+					</button>
+					<button className="employeeItems" onClick={handleRemove}>
+						REMOVE
+					</button>
+					<button className="employeeItems">MOVE</button>
 				</>
 			)}
-			<button className="employeeItems">PROMOTE</button>
-			<button className="employeeItems" onClick={handleRemove}>
-				REMOVE
-			</button>
-			<button className="employeeItems">MOVE</button>
 		</div>
 	);
 }
