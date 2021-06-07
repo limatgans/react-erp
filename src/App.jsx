@@ -32,9 +32,9 @@ function App() {
 	}, [empData, posData, teamData]);
 
 	// CRUD fns
-	const addEmployee = ({name, phone, email, position, teamId}) => {
+	const addEmployee = ({ name, phone, email, position, teamId }) => {
 		const empExists = empData.find(emp => emp.email === email);
-		const posExists = posData.find(pos => pos.id === position);
+		const posExists = posData.find(pos => pos.id === Number(position));
 		const teamExists = teamData.find(team => team.id === teamId);
 
 		if (empExists) {
@@ -58,16 +58,29 @@ function App() {
 			};
 		}
 
-		// TODO: Add NEW EMP to TEAM DATA
+		const newEmpId = empData[empData.length - 1].id + 1;
+
+		// Assigning New Emp to a team
+		const newTeam = teamData.map(t => {
+			if (t.id === teamId) {
+				return {
+					...t,
+					members: [...t.members, newEmpId],
+				};
+			}
+			return t;
+		});
 		setEmpData([
 			...empData,
 			{
-				id: empData[empData.length - 1].id + 1,
+				id: newEmpId,
 				name,
 				phone,
 				email,
+				position,
 			},
 		]);
+		setTeamData(newTeam);
 		return {
 			status: true,
 			msg: "Employee Added Successfully",
@@ -196,18 +209,20 @@ function App() {
 
 		const positions = posData
 			.filter(pos => pos.reportsTo === team.reportsTo)
-			.map(pos => { return {name: pos.name, id: pos.id}});
+			.map(pos => {
+				return { name: pos.name, id: pos.id };
+			});
 
 		return {
 			status: true,
 			msg: "Positions fetched",
-			data: positions
-		}
+			data: positions,
+		};
 	};
 
-	const getTeamsForEmp = (empId) => {
+	const getTeamsForEmp = empId => {
 		const emp = empData.find(emp => emp.id === id);
-		if (!emp ) {
+		if (!emp) {
 			return {
 				status: false,
 				msg: "Employee Details not found",
@@ -222,14 +237,16 @@ function App() {
 			};
 		}
 
-		const teamsAvailable = teamData.filter((team) => team.reportsTo === pos.reportsTo && !team.members.includes(empId)) 
-		
+		const teamsAvailable = teamData.filter(
+			team => team.reportsTo === pos.reportsTo && !team.members.includes(empId),
+		);
+
 		return {
 			status: true,
 			msg: "Teams fetched",
-			data: teamsAvailable
-		}
-	}
+			data: teamsAvailable,
+		};
+	};
 
 	return (
 		<>
@@ -246,7 +263,6 @@ function App() {
 							promoteEmployee={promoteEmployee}
 							getPositionsForTeam={getPositionsForTeam}
 							getTeamsForEmp={getTeamsForEmp}
-
 						/>
 					);
 				})}

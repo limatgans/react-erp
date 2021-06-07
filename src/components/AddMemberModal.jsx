@@ -1,12 +1,23 @@
 import React, { useState } from "react";
 
 function AddMemberModal(props) {
-	const { visible, closeModal, addEmployee, teamId } = props;
+	const {
+		visible,
+		closeModal,
+		addEmployee,
+		teamId,
+		getPositionsForTeam,
+	} = props;
 
 	const [name, setName] = useState("");
 	const [email, setEmail] = useState("");
 	const [phone, setPhone] = useState("");
-	const [position, setPosition] = useState("");
+	const tempPost = getPositionsForTeam(teamId);
+	if (!tempPost.status) {
+		return alert(tempPost.msg);
+	}
+	const [positionDropDown, setPosDropDwn] = useState(tempPost.data);
+	const [position, setPosition] = useState(positionDropDown[0]?.id);
 
 	const handleNameChange = e => {
 		setName(e.target.value);
@@ -20,13 +31,26 @@ function AddMemberModal(props) {
 		setPhone(e.target.value);
 	};
 
+	const handlePosChange = e => {
+		setPosition(e.target.value);
+	};
+
 	const handleSave = e => {
 		if (!name || !email || !phone) {
 			alert("Please fill all details");
 			return;
 		}
-		const status = addEmployee({name, email, phone, teamId});
+		const status = addEmployee({ name, email, phone, teamId, position });
+
 		alert(status.msg);
+
+		if (status.status) {
+			setName("");
+			setPhone("");
+			setPosition(positionDropDown[0]?.id);
+			setEmail("");
+			closeModal();
+		}
 	};
 
 	return (
@@ -64,6 +88,20 @@ function AddMemberModal(props) {
 									onChange={handlePhoneChange}
 									placeholder="Enter Phone here"
 								/>
+							</div>
+							<div>
+								Position :{" "}
+								<select
+									onChange={handlePosChange}
+									placeholder="Select a position">
+									{positionDropDown.map(pos => {
+										return (
+											<option key={pos.id} value={pos.id}>
+												{pos.name}
+											</option>
+										);
+									})}
+								</select>
 							</div>
 						</div>
 

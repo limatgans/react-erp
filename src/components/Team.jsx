@@ -43,6 +43,7 @@ function TeamsList({
 				closeModal={closeAddNewMemModal}
 				addEmployee={addEmployee}
 				teamId = {id}
+				getPositionsForTeam={getPositionsForTeam}
 			/>
 		</>
 	);
