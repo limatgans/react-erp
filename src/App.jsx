@@ -3,6 +3,9 @@ import logo from "./logo.svg";
 import "./App.css";
 import { employeeData, teams, position } from "./data/data";
 import EmployeeCardList from "./components/EmployeeCardList";
+import EmployeeCard from "./components/EmployeeCard";
+import CreateTeamModal from "./components/CreateTeamModal";
+
 import TeamsList from "./components/Team";
 
 import Header from "./components/Header";
@@ -13,14 +16,16 @@ function App() {
 	const [empData, setEmpData] = useState(employeeData);
 	const [posData, setPosData] = useState(position);
 	const [teamData, setTeamData] = useState(teams);
+	const [showNewTeamModal, toggleNewTeamModal] = useState(false);
 
 	useEffect(() => {
+		// Mapping Employee with position
 		const empPositionMapData = empData.map(emp => {
 			const posDetails = posData.find(pos => pos.id === emp.position);
-			return { ...emp, position: posDetails.name };
+			return { ...emp, position: posDetails.name, positionId: emp.position };
 		});
-		setDisplayData(empPositionMapData);
 
+		// Mapping Teams with details of members
 		const teamDetails = teamData.map(team => {
 			const memData = team.members.map(member => {
 				const memDetails = empPositionMapData.find(emp => emp.id == member);
@@ -28,6 +33,19 @@ function App() {
 			});
 			return { ...team, members: memData };
 		});
+
+		const mgmtPositions = [1, 2, 3, 4];
+
+		const mgmtPositionMapData = empPositionMapData.filter(emp => {
+			return mgmtPositions.includes(emp.positionId);
+		});
+
+		const mgmtData = mgmtPositionMapData.map(emp => {
+			const teams = teamDetails.filter(t => t.reportsTo === emp.id);
+			return { ...emp, teams };
+		});
+
+		setDisplayData(mgmtData);
 		setTeamDisplayData(teamDetails);
 	}, [empData, posData, teamData]);
 
@@ -96,6 +114,23 @@ function App() {
 			};
 		}
 
+		if (id === 1) {
+			return {
+				status: false,
+				msg: "Employee cannot be removed as he/she is CEO",
+			};
+		}
+
+		const teamsReporting = teamData.filter(t => t.reportsTo === id);
+
+		if (teamsReporting.length !== 0) {
+			return {
+				status: false,
+				msg:
+					"Employee cannot be removed as he/she has teams under him. Please reassign the team",
+			};
+		}
+
 		// Removing Employee from Teams Data
 		const newTeams = teamData.map(team => {
 			const memIndex = team.members.findIndex(mem => mem === id);
@@ -135,7 +170,7 @@ function App() {
 		}
 
 		const newEmpList = empData.map((emp, idx) => {
-			if (idx === id) {
+			if (emp.id === id) {
 				return {
 					...emp,
 					name: name ? name : emp.name,
@@ -170,7 +205,7 @@ function App() {
 		if (posDetails.reportsTo === 0) {
 			return {
 				status: false,
-				msg: `${emp.name} cannot be promoted as he is already at the top of position table`,
+				msg: `${emp.name} cannot be promoted as he/she is already at the top of position table`,
 			};
 		}
 
@@ -244,7 +279,6 @@ function App() {
 		// 	team => team.reportsTo === pos.reportsTo && !team.members.includes(empId),
 		// );
 
-
 		const teamsAvailable = teamData.filter(team => {
 			// Find which employee the team reports to
 			const reportingEmployee = empData.find(emp => emp.id === team.reportsTo);
@@ -255,7 +289,7 @@ function App() {
 				reportingEmployee.position === pos.reportsTo &&
 				!team.members.includes(empId)
 			);
-		}); 
+		});
 
 		return {
 			status: true,
@@ -299,23 +333,93 @@ function App() {
 		};
 	};
 
+	const createTeams = ({ empId, teamName }) => {
+		const teams = teamData.filter(t => t.name === teamName);
+
+		if (teams.length !== 0) {
+			return {
+				status: false,
+				msg: "Two teams cannot have the same name.",
+			};
+		}
+
+		const emp = empData.find(emp => emp.id === empId);
+		if (!emp) {
+			return {
+				status: false,
+				msg: "Employee Details not found",
+			};
+		}
+
+		const newTeams = [
+			...teamData,
+			{
+				id: teamData[teamData.length - 1].id + 1,
+				name: teamName,
+				members: [],
+				reportsTo: empId,
+			},
+		];
+
+		setTeamData(newTeams);
+		return {
+			status: true,
+			msg: "Team created successfully!",
+		};
+	};
+
 	return (
 		<>
 			<div className="App">
 				<Header />
-				{teamDisplayData.map((team, index) => {
+				{displayData.map((employee, index) => {
 					return (
-						<TeamsList
-							key={team.id}
-							data={team}
-							addEmployee={addEmployee}
-							removeEmployee={removeEmployee}
-							editEmployee={editEmployee}
-							promoteEmployee={promoteEmployee}
-							getPositionsForTeam={getPositionsForTeam}
-							getTeamsForEmp={getTeamsForEmp}
-							moveEmployee={moveEmployee}
-						/>
+						<>
+							<h3>{employee.position}</h3>
+							<EmployeeCard
+								key={employee.id}
+								id={employee.id}
+								name={employee.name}
+								position={employee.position}
+								email={employee.email}
+								phone={employee.phone}
+								removeEmployee={removeEmployee}
+								editEmployee={editEmployee}
+								promoteEmployee={promoteEmployee}
+								getTeamsForEmp={getTeamsForEmp}
+								moveEmployee={moveEmployee}
+							/>
+							<h3>Teams Under {employee.name}</h3>
+							<button
+								onClick={e => {
+									toggleNewTeamModal(true);
+								}}>
+								Create a new Team
+							</button>
+							<CreateTeamModal
+								visible={showNewTeamModal}
+								empId={employee.id}
+								createTeams={createTeams}
+								closeModal={e => {
+									toggleNewTeamModal(false);
+								}}
+							/>
+							{employee.teams.map(team => {
+								return (
+									<TeamsList
+										key={team.id}
+										data={team}
+										addEmployee={addEmployee}
+										removeEmployee={removeEmployee}
+										editEmployee={editEmployee}
+										promoteEmployee={promoteEmployee}
+										getPositionsForTeam={getPositionsForTeam}
+										getTeamsForEmp={getTeamsForEmp}
+										moveEmployee={moveEmployee}
+									/>
+								);
+							})}
+						</>
 					);
 				})}
 				{/* <EmployeeCardList data={displayData} /> */}

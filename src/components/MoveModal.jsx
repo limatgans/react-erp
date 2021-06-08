@@ -31,7 +31,7 @@ export default function MoveModal({
 
 	return (
 		<>
-			{visible && (
+			{visible && ( 
 				<div className="modal">
 					<div className="modal-content">
 						<div className="modal-header">
