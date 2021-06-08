@@ -8,3 +8,6 @@ This project uses [VITE](https://vitejs.dev/) instead of create-react-app. For m
 - Git clone this repo
 - Install dependencies `yarn`
 - To run development server `yarn dev`
+
+To imitate backend, have used data.js to provide dummy data.
+
